@@ -1,0 +1,18 @@
+<h2>
+  Log In
+</h2>
+
+<%= form_with scope: :session, url: login_path do |form| %>
+  <div>
+    <%= form.text_field :username, placeholder: "User Name", required: true %>
+
+    <%= form.submit "Log in" %>
+
+    <div>
+      <p>
+        Don't have an account?
+        <%= link_to "Register", signup_path %>
+      </p>
+    </div>
+  </div>
+<% end %>

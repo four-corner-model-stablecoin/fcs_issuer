@@ -1,0 +1,67 @@
+# frozen_string_literal: true
+
+create_table 'users', comment: 'ユーザー' do |t|
+  t.string :username, null: false, comment: 'ユーザー名'
+
+  t.timestamps null: false
+
+  t.index :username, unique: true
+end
+
+create_table 'accounts', comment: '口座' do |t|
+  t.references :user, null: false, foreign_key: { to_table: :users }
+  t.decimal :balance, precision: 18, scale: 2, null: false, comment: '残高', default: 0.0
+  t.string :account_number, null: false, comment: '口座番号'
+  t.string :branch_code, null: false, comment: '支店コード'
+  t.string :branch_name, null: false, comment: '支店名'
+
+  t.timestamps null: false
+
+  t.index :account_number, unique: true
+end
+
+create_table 'wallets', comment: 'ウォレット' do |t|
+  # UTXO Provider 等のユーザーを持たないウォレットを許容するため null: true
+  t.references :user, null: true, foreign_key: { to_table: :users }
+  t.decimal :balance, precision: 18, scale: 2, null: false, comment: '残高', default: 0.0
+
+  t.timestamps null: false
+
+  t.index :glueby_wallet_id, unique: true
+end
+
+create_table 'wallet_payment_transctions', comment: 'ウォレット支払い履歴' do |t|
+  t.references :wallet, null: true, foreign_key: { to_table: :wallets }
+  t.integer 'amount', null: false
+  t.integer 'payment_type', null: false
+  t.datetime 'transaction_time', null: false
+
+  t.timestamps null: false
+end
+
+create_table 'dids', comment: 'DID' do |t|
+  t.references :user, null: false, foreign_key: { to_table: :users }
+  t.string 'short_form', null: false
+  t.index :short_form, unique: true
+end
+
+create_table 'contracts', comment: '契約' do |t|
+  t.references :did, null: false, foreign_key: { to_table: :dids }
+  t.string 'script_pubkey', null: false
+  t.string 'redeed_script', null: false
+  t.datetime 'contracted_at', null: false, comment: '契約締結日'
+  t.datetime 'effective_date', null: false, comment: '効力発生日'
+  t.datetime 'expired_at', null: false, comment: '失効日'
+end
+
+create_table 'stable_coins', comment: 'ステーブルコイン' do |t|
+  t.references :contract, null: false, foreign_key: { to_table: :contracts }
+  t.string 'color_id', null: false
+end
+
+create_table 'coin_transctions', comment: '' do |t|
+  t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
+  t.integer 'amount', null: false
+  t.integer 'payment_type', null: false
+  t.datetime 'transaction_time', null: false
+end

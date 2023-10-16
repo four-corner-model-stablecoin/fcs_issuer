@@ -10,4 +10,5 @@ Rails.application.routes.draw do
   resource :user, only: %i[show]
   resource :wallet, only: %i[show new create]
   resources :contracts, only: %i[new create]
+  resources :stable_coins, only: %i[new create]
 end

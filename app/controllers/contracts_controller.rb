@@ -4,12 +4,12 @@ class ContractsController < ApplicationController
   def new; end
 
   def create
-    issuer_did = Did.first.short_form
+    issuer_did = Did.first
 
     # brandへ契約リクエストを送る
     json = {
       name: 'tapyrus_issuer',
-      did: issuer_did,
+      did: issuer_did.short_form,
     }.to_json
     response = Net::HTTP.post(
     URI('http://localhost:3001/contracts/agreement/issuer'),
@@ -27,8 +27,8 @@ class ContractsController < ApplicationController
     effect_at = body['effect_at']
     expire_at = body['expire_at']
 
-    brand_did = Did.create(short_form: brand_did_short_form)
-    contract_with_brand = Contract.create(did: brand_did, redeem_script:, script_pubkey:, brand_did:, issuer_did:, contracted_at:, effect_at:, expire_at:)
+    brand_did = Did.find_or_create_by(short_form: brand_did_short_form)
+    contract_with_brand = Contract.create(issuer_did:, brand_did:, redeem_script:, script_pubkey:, contracted_at:, effect_at:, expire_at:)
     StableCoin.create(contract: contract_with_brand, color_id:)
     redirect_to root_path
   end

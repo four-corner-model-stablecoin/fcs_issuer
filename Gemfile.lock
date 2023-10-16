@@ -60,6 +60,9 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
       zeitwerk (~> 2.3)
+    aes_key_wrap (1.1.0)
+    base64 (0.1.1)
+    bindata (2.4.15)
     bindex (0.8.1)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
@@ -68,21 +71,44 @@ GEM
     coderay (1.1.3)
     concurrent-ruby (1.2.2)
     crass (1.0.6)
+    daemon-spawn (0.4.2)
     date (3.3.3)
     diffy (3.4.2)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
+    ecdsa (1.2.0)
     erubi (1.12.0)
+    eventmachine (1.2.7)
+    eventmachine_httpserver (0.2.1)
+    faraday (2.7.11)
+      base64
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-net_http (3.0.2)
     ffi (1.16.3)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    glueby (1.1.2)
+      activerecord (~> 6.1.3)
+      tapyrus (>= 0.3.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
+    iniparse (1.5.0)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    json-jwt (1.16.3)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      bindata
+      faraday (~> 2.0)
+      faraday-follow_redirects
+    json_pure (2.6.3)
+    leb128 (1.0.0)
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -99,6 +125,7 @@ GEM
     mini_mime (1.1.5)
     minitest (5.20.0)
     msgpack (1.7.2)
+    murmurhash3 (0.1.7)
     net-imap (0.4.1)
       date
       net-protocol
@@ -161,6 +188,7 @@ GEM
     ridgepole (1.2.1)
       activerecord (>= 5.1, < 7.1)
       diffy
+    ruby2_keywords (0.0.5)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
     sassc (2.4.0)
@@ -172,6 +200,7 @@ GEM
       sprockets-rails
       tilt
     semantic_range (3.0.0)
+    siphash (0.0.1)
     spring (4.1.1)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
@@ -181,6 +210,22 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     sqlite3 (1.6.7-arm64-darwin)
+    tapyrus (0.3.4)
+      activesupport (>= 5.2.3)
+      daemon-spawn
+      ecdsa
+      eventmachine
+      eventmachine_httpserver
+      ffi
+      iniparse
+      json_pure (>= 2.3.1)
+      leb128 (~> 1.0.0)
+      murmurhash3
+      siphash
+      terminal-table (~> 3.0.2)
+      thor
+    terminal-table (3.0.2)
+      unicode-display_width (>= 1.1.1, < 3)
     thor (1.2.2)
     tilt (2.3.0)
     timeout (0.4.0)
@@ -189,6 +234,7 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    unicode-display_width (2.4.2)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -211,7 +257,9 @@ DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
   dotenv-rails
+  glueby
   jbuilder (~> 2.7)
+  json-jwt
   listen (~> 3.3)
   pry-rails
   puma (~> 5.0)
@@ -221,6 +269,7 @@ DEPENDENCIES
   sass-rails (>= 6)
   spring
   sqlite3 (~> 1.4)
+  tapyrus
   turbolinks (~> 5)
   tzinfo-data
   web-console (>= 4.1.0)

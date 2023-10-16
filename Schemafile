@@ -49,6 +49,8 @@ create_table 'contracts', comment: '契約' do |t|
   t.references :did, null: false, foreign_key: { to_table: :dids }
   t.string 'script_pubkey', null: false
   t.string 'redeem_script', null: false
+  t.string 'issuer_did', null: false
+  t.string 'brand_did', null:false
   t.datetime 'contracted_at', null: false, comment: '契約締結日'
   t.datetime 'effect_at', null: false, comment: '効力発生日'
   t.datetime 'expire_at', null: false, comment: '失効日'

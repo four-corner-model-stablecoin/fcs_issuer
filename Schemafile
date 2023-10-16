@@ -50,8 +50,8 @@ create_table 'contracts', comment: '契約' do |t|
   t.string 'script_pubkey', null: false
   t.string 'redeed_script', null: false
   t.datetime 'contracted_at', null: false, comment: '契約締結日'
-  t.datetime 'effective_date', null: false, comment: '効力発生日'
-  t.datetime 'expired_at', null: false, comment: '失効日'
+  t.datetime 'effect_at', null: false, comment: '効力発生日'
+  t.datetime 'expire_at', null: false, comment: '失効日'
 end
 
 create_table 'stable_coins', comment: 'ステーブルコイン' do |t|

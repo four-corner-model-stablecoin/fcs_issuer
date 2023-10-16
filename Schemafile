@@ -40,7 +40,7 @@ create_table 'wallet_payment_transctions', comment: 'ウォレット支払い履
 end
 
 create_table 'dids', comment: 'DID' do |t|
-  t.references :user, null: false, foreign_key: { to_table: :users }
+  t.references :user, null: true, foreign_key: { to_table: :users }
   t.string 'short_form', null: false
   t.index :short_form, unique: true
 end

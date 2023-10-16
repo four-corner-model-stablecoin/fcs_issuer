@@ -5,6 +5,6 @@ class Contract < ApplicationRecord
   validates :script_pubkey, presence: true
   validates :redeem_script, presence: true
   validates :contracted_at, presence: true
-  validates :effective_date, presence: true
-  validates :expired_at, presence: true
+  validates :effect_at, presence: true
+  validates :expire_at, presence: true
 end

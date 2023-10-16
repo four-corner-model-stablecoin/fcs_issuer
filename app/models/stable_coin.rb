@@ -2,6 +2,8 @@
 
 # サービス内で流通するトークンを管理するモデル
 class StableCoin < ApplicationRecord
+  belongs_to :contract
+
   validates :color_id, presence: true
 
   TOKEN_ID = 1 # TODO: .envにでも書きたい

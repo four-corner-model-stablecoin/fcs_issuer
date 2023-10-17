@@ -10,9 +10,7 @@ class UsersController < ApplicationController
   def new; end
 
   def create
-    binding.pry
     user = User.create(username: user_params['username'])
-    binding.pry
     user.build_account.save!
     user.build_wallet.save!
     # User作成の前に、Userから提示されたDIDが正しいのかなどの処理は必要そう。

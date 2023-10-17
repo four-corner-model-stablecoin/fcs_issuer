@@ -4,6 +4,8 @@
 class StableCoin < ApplicationRecord
   belongs_to :contract
 
+  has_many :coin_transaction
+
   validates :color_id, presence: true
 
   TOKEN_ID = 1 # TODO: .envにでも書きたい

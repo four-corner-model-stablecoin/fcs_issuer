@@ -1,0 +1,10 @@
+<tbody>
+  <% @wallet_transactions.each do |wallet_transaction| %>
+    <tr>
+      <td><%= wallet_transaction.id %></td>
+      <td><%= wallet_transaction.amount %></td>
+      <td><%= wallet_transaction.payment_type %></td>
+      <td><%= wallet_transaction.transaction_time %></td>
+    </tr>
+  <% end %>
+</tbody>

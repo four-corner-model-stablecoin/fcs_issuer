@@ -8,6 +8,8 @@ class Account < ApplicationRecord
 
   belongs_to :user
 
+  has_many :account_transaction
+
   after_initialize do
     self.balance ||= 0.0
     self.account_number ||= "1#{format('%06d', SecureRandom.random_number(10**6))}"

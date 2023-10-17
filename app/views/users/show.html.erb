@@ -5,7 +5,16 @@
     </h2>
 
     <div>
-      <%= link_to user_path do %>
+      <div>
+        User Name
+      </div>
+      <div>
+        <%= current_user.username %>
+      </div>
+    </div>
+
+    <div>
+      <%= link_to new_account_path do %>
         <div>
           <div>
             Account Balance
@@ -19,7 +28,7 @@
 
     <% if current_user.wallet.present? %>
       <div>
-        <%= link_to wallet_path do %>
+        <%= link_to new_stable_coin_path do %>
           <div>
             <div>
               Wallet Balance
@@ -35,12 +44,5 @@
     <div>
       <%= button_to 'Log out', logout_path, method: :delete %>
     </div>
-
-    <%= form_with scope: :user, url: user_path do |form| %>
-      <div>
-        <%= form.text_field :username, readonly: true %>
-      </div>
-    <% end %>
-
   </div>
 </div>

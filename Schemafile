@@ -30,7 +30,17 @@ create_table 'wallets', comment: 'ウォレット' do |t|
   t.index :glueby_wallet_id, unique: true
 end
 
-create_table 'wallet_payment_transctions', comment: 'ウォレット支払い履歴' do |t|
+create_table 'wallet_payment_transactions', comment: 'ウォレット支払い履歴' do |t|
+  t.references :wallet, null: true, foreign_key: { to_table: :wallets }
+  t.integer 'amount', null: false
+  t.string 'payee', null: false, comment: '支払い先'
+  t.string 'payer', null: false, comment: '支払い元'
+  t.datetime 'transaction_time', null: false
+
+  t.timestamps null: false
+end
+
+create_table 'wallet_transactions', comment: 'ウォレットの増減記録' do |t|
   t.references :wallet, null: true, foreign_key: { to_table: :wallets }
   t.integer 'amount', null: false
   t.integer 'payment_type', null: false
@@ -62,12 +72,22 @@ create_table 'stable_coins', comment: 'ステーブルコイン' do |t|
   t.string 'color_id', null: false
 end
 
-create_table 'coin_transctions', comment: '' do |t|
+create_table 'coin_transactions', comment: 'ステーブルコインの発行償還履歴' do |t|
   t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
-  t.text 'tapyrus_txid', null: false
+  t.references :wallet, null: false, foreign_key: { to_table: :wallets }
+  t.text 'tx_hex', null: false
   t.integer 'amount', null: false
   t.integer 'payment_type', null: false
   t.datetime 'transaction_time', null: false
+end
+
+create_table 'account_transactions', comment: '口座の残高履歴' do |t|
+  t.references :account, null: true, foreign_key: { to_table: :accounts }
+  t.integer 'amount', null: false
+  t.integer 'payment_type', null: false
+  t.datetime 'transaction_time', null: false
+
+  t.timestamps null: false
 end
 
 create_table 'keys', comment: 'userの秘密鍵' do |t|

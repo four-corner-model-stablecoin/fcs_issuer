@@ -2,9 +2,35 @@
   Issue
 </h2>
 
+<div>
+  <div>
+    Wallet Balance
+  </div>
+  <div>
+    <%= number_to_currency(current_user.wallet.balance) %>
+  </div>
+</div>
+
 <%= form_with scope: :stable_coin, url: stable_coins_path do |form| %>
   <div>
     <%= form.number_field :amount, placeholder: "amount", required: true %>
     <%= form.submit "Issue" %>
   </div>
 <% end %>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>amount</th>
+    <th>payment_type</th>
+    <th>取引日時</th>
+  </tr>
+<% @wallet_transactions.each do |wallet_transaction| %>
+  <tr>
+  <td><%= wallet_transaction.id %></td>
+  <td><%= wallet_transaction.amount %></td>
+  <td><%= wallet_transaction.payment_type %></td>
+  <td><%= wallet_transaction.transaction_time %></td>
+  </tr>
+<% end %>
+</table>

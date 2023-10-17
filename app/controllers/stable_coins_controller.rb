@@ -3,7 +3,9 @@
 class StableCoinsController < ApplicationController
   before_action :signed_in?
 
-  def new; end
+  def new
+    @wallet_transactions = current_user.wallet.wallet_transaction.order(transaction_time: :DESC)
+  end
 
   def create
     amount = deposit_params[:amount].to_i
@@ -16,7 +18,7 @@ class StableCoinsController < ApplicationController
     generate_block
     input_tx = Tapyrus::Tx.parse_from_payload(Glueby::Internal::RPC.client.getrawtransaction(txid).htb)
 
-    # unsigned作成する
+    # unsigned_tx作成する
     tx = Tapyrus::Tx.new
     vout = 0
     input_tx.outputs.each_with_index do |output, i|
@@ -29,7 +31,7 @@ class StableCoinsController < ApplicationController
     fee_tapyrus = (fee * (10**8)).to_i
     change_tapyrus = input_tapyrus - fee_tapyrus
 
-    # color_idの導出
+    # colorの導出
     user_key = resolve_did(current_user.did)
     issuer_key =Tapyrus::Key.new(priv_key: stable_coin.contract.issuer_did.key.private_key, key_type: 0)
     brand_key = resolve_did(stable_coin.contract.brand_did)
@@ -57,20 +59,37 @@ class StableCoinsController < ApplicationController
 
     tx.in[0].script_sig = script_sig
 
-    binding.pry
-
-
     Glueby::Internal::RPC.client.sendrawtransaction(tx.to_payload.bth)
 
     account = current_user.account
     account.update!(balance: account.balance - amount)
-    # CoinTransaction.create(
-    #   stable_coin:,
-    #   tapyrus_txid:, 
-    #   amount:,
-    #   payment_type:, 0
-    #   transaction_time: Time.current
-    # )
+
+    wallet = current_user.wallet
+    wallet.update!(balance: wallet.balance + amount)
+
+    CoinTransaction.create(
+      stable_coin:,
+      wallet:,
+      tx_hex: tx.to_hex, 
+      amount: tx.outputs[vout].value,
+      payment_type: 0,
+      transaction_time: Time.current
+    )
+
+    WalletTransaction.create(
+      wallet:,
+      amount: tx.outputs[vout].value,
+      payment_type: 0,
+      transaction_time: Time.current
+    )
+
+    AccountTransaction.create(
+      account: account,
+      amount: -tx.outputs[vout].value,
+      payment_type: 1,
+      transaction_time: Time.current
+    )
+    generate_block
     redirect_to user_path, notice: "Issue successful."
   end
 

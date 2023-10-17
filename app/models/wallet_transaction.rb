@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-class CoinTransaction < ApplicationRecord
-  belongs_to :stable_coin
+class WalletTransaction < ApplicationRecord
   belongs_to :wallet
 
   enum payment_type: {
-    issue: 0,
-    burn: 1
+    deposit: 0,
+    withdrawal: 1
   }
 
   validates :amount, presence: true

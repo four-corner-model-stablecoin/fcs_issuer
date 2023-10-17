@@ -8,10 +8,10 @@ class StableCoinsController < ApplicationController
   def create
     amount = deposit_params[:amount].to_i
     stable_coin = StableCoin.last
+    script_pubkey = Tapyrus::Script.parse_from_payload(stable_coin.contract.script_pubkey.htb)
+    redeem_script = Tapyrus::Script.parse_from_payload(stable_coin.contract.redeem_script.htb)
 
     # 大元のUTXOを作成する
-    script_pubkey_hex = stable_coin.contract.script_pubkey
-    script_pubkey = Tapyrus::Script.parse_from_payload(script_pubkey_hex.htb)
     txid = Glueby::Internal::RPC.client.sendtoaddress(script_pubkey.to_addr, 1)
     generate_block
     input_tx = Tapyrus::Tx.parse_from_payload(Glueby::Internal::RPC.client.getrawtransaction(txid).htb)
@@ -19,8 +19,8 @@ class StableCoinsController < ApplicationController
     # unsigned作成する
     tx = Tapyrus::Tx.new
     vout = 0
-    tx.outputs.each_with_index do |output, i|
-      vout = i if output.script_pubkey = script_pubkey
+    input_tx.outputs.each_with_index do |output, i|
+      vout = i if output.script_pubkey == script_pubkey
     end
     input_tapyrus = input_tx.outputs[vout].value
     tx.in << Tapyrus::TxIn.new(out_point: Tapyrus::OutPoint.from_txid(txid, vout))
@@ -49,11 +49,11 @@ class StableCoinsController < ApplicationController
       params_json,
       'Content-Type' => 'application/json'
     )
-    sig_hash = tx.sighash_for_input(vout, script_pubkey)
+
+    sig_hash = tx.sighash_for_input(0, redeem_script)
     sig1 = JSON.parse(response.body)['signature'].htb
     sig2 = issuer_key.sign(sig_hash) + [Tapyrus::SIGHASH_TYPE[:all]].pack("C")
-    redeem_script = stable_coin.contract.redeem_script.htb
-    script_sig = Tapyrus::Script.new << OP_0 << sig2 << sig1 << redeem_script
+    script_sig = Tapyrus::Script.new << OP_0 << sig2 << sig1 << redeem_script.to_payload
 
     tx.in[0].script_sig = script_sig
 

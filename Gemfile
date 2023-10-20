@@ -27,7 +27,10 @@ gem 'jbuilder', '~> 2.7'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.4', require: false
+gem 'rubocop'
+gem 'rubocop-rails'
 gem 'ridgepole'
+gem 'rails-erd'
 gem 'dotenv-rails'
 gem 'pry-rails'
 gem 'tapyrus'

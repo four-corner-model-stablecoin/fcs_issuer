@@ -95,6 +95,16 @@ create_table 'keys', comment: 'userの秘密鍵' do |t|
   t.string 'private_key', null: true
 end
 
+create_table 'payment_requests', comment: '送金依頼' do |t|
+  # t.references :なんとかトランサクジョン, null: false, foreign_key: { to_table: :なんとかトランサクジョンs }
+  t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
+  t.references :user, null: true, foreign_key: { to_table: :users }
+  t.string 'request_id', null: false, index: true
+  t.integer 'status', null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+
+  t.timestamps null: false
+end
+
 create_table 'glueby_keys', force: :cascade do |t|
   t.string 'private_key'
   t.string 'public_key'

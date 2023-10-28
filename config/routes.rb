@@ -15,4 +15,7 @@ Rails.application.routes.draw do
 
   post 'payment/create', to: 'payments#create'
   post 'payment/confirm', to: 'payments#confirm'
+
+  post 'withdraw/create', to: 'withdraws#create'
+  post 'withdraw/confirm', to: 'withdraws#confirm'
 end

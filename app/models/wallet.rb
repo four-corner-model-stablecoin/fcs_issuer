@@ -2,9 +2,8 @@
 
 class Wallet < ApplicationRecord
   belongs_to :user, optional: true
-  has_many :wallet_payment_transaction
   has_many :wallet_transaction
-  has_many :coin_transaction
+  has_many :stable_coin_transactions
 
   # カラムでbalanceを都度アップデートしていくならいらない？
   # def balance

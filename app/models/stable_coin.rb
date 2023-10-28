@@ -1,18 +1,11 @@
 # frozen_string_literal: true
 
-# サービス内で流通するトークンを管理するモデル
+# 発行トークンを管理するモデル
 class StableCoin < ApplicationRecord
-  belongs_to :contract
-
-  has_many :coin_transaction
-
   validates :color_id, presence: true
 
-  TOKEN_ID = 1 # TODO: .envにでも書きたい
-
-  # def self.instance
-  #   find_or_create_by!(id: TOKEN_ID)
-  # end
+  has_many :stable_coin_transactions
+  belongs_to :contract
 
   # 発行済みトークンの総量
   def total_amount

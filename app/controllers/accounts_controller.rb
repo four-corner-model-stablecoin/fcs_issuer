@@ -16,7 +16,7 @@ class AccountsController < ApplicationController
     AccountTransaction.create(
       account:,
       amount:,
-      payment_type: 0,
+      transaction_type: 0,
       transaction_time: Time.current
     )
     redirect_to user_path

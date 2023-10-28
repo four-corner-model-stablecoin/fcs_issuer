@@ -22,14 +22,14 @@
   <tr>
     <th>ID</th>
     <th>amount</th>
-    <th>payment_type</th>
+    <th>transaction_type</th>
     <th>取引日時</th>
   </tr>
 <% @account_transactions.each do |account_transaction| %>
   <tr>
   <td><%= account_transaction.id %></td>
   <td><%= account_transaction.amount %></td>
-  <td><%= account_transaction.payment_type %></td>
+  <td><%= account_transaction.transaction_type %></td>
   <td><%= account_transaction.transaction_time %></td>
   </tr>
 <% end %>

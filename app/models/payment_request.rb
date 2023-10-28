@@ -2,9 +2,11 @@
 
 class PaymentRequest < ApplicationRecord
   validates :request_id, presence: true
+  validates :vc, presence: true
 
-  belongs_to :user
+  belongs_to :payment_transaction, optional: true
   belongs_to :stable_coin
+  belongs_to :user
 
   enum status: {
     created: 0,

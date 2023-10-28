@@ -105,6 +105,16 @@ create_table 'payment_requests', comment: '送金依頼' do |t|
   t.timestamps null: false
 end
 
+create_table 'withdrawal_requests', comment: '償還依頼' do |t|
+  # t.references :なんとかトランサクジョン, null: false, foreign_key: { to_table: :なんとかトランサクジョンs }
+  t.string 'request_id', null: false, index: true
+  t.integer 'status', null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+  t.string 'brand_to_issuer_txid', null: true
+  t.string 'burn_txid', null: true
+
+  t.timestamps null: false
+end
+
 create_table 'glueby_keys', force: :cascade do |t|
   t.string 'private_key'
   t.string 'public_key'

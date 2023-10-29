@@ -14,4 +14,6 @@ WORKDIR $APP_ROOT
 COPY . .
 RUN bundle install
 
+ENV NODE_OPTIONS --openssl-legacy-provider
+
 ENTRYPOINT ["bin/docker-entrypoint"]

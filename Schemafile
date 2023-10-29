@@ -1,119 +1,157 @@
 # frozen_string_literal: true
 
-create_table 'users', comment: 'ユーザー' do |t|
-  t.string :username, null: false, comment: 'ユーザー名'
+create_table 'dids', comment: 'DID' do |t|
+  t.string :short_form, null: false, index: { unique: true }, comment: 'DID Short form'
 
   t.timestamps null: false
+end
 
-  t.index :username, unique: true
+create_table 'keys', comment: '鍵' do |t|
+  t.references :did, null: true, foreign_key: { to_table: :dids }
+  t.string :jwk, null: false, comment: '{ ..jwk }.to_json'
+
+  t.timestamps null: false
+end
+
+create_table 'users', comment: 'ユーザー' do |t|
+  t.references :did, null: false, foreign_key: { to_table: :dids }
+  t.string :username, null: false, index: { unique: true }, comment: 'ユーザー名'
+
+  t.timestamps null: false
 end
 
 create_table 'accounts', comment: '口座' do |t|
   t.references :user, null: false, foreign_key: { to_table: :users }
   t.decimal :balance, precision: 18, scale: 2, null: false, comment: '残高', default: 0.0
-  t.string :account_number, null: false, comment: '口座番号'
+  t.string :account_number, null: false, index: { unique: true }, comment: '口座番号'
   t.string :branch_code, null: false, comment: '支店コード'
   t.string :branch_name, null: false, comment: '支店名'
 
   t.timestamps null: false
+end
 
-  t.index :account_number, unique: true
+create_table 'account_transactions', comment: '口座の残高履歴' do |t|
+  t.references :account, null: true, foreign_key: { to_table: :accounts }
+  t.integer :amount, null: false
+  t.integer :transaction_type, null: false, comment: '0: 入金, 1: 出金, 2: 口座振替'
+  t.datetime :transaction_time, null: false
+
+  t.timestamps null: false
 end
 
 create_table 'wallets', comment: 'ウォレット' do |t|
-  # UTXO Provider 等のユーザーを持たないウォレットを許容するため null: true
   t.references :user, null: true, foreign_key: { to_table: :users }
   t.decimal :balance, precision: 18, scale: 2, null: false, comment: '残高', default: 0.0
 
   t.timestamps null: false
-
-  t.index :glueby_wallet_id, unique: true
 end
 
-create_table 'wallet_payment_transactions', comment: 'ウォレット支払い履歴' do |t|
+create_table 'wallet_transactions', comment: 'ウォレットの残高履歴' do |t|
   t.references :wallet, null: true, foreign_key: { to_table: :wallets }
-  t.integer 'amount', null: false
-  t.string 'payee', null: false, comment: '支払い先'
-  t.string 'payer', null: false, comment: '支払い元'
-  t.datetime 'transaction_time', null: false
+  t.integer :amount, null: false
+  t.integer :transaction_type, null: false, comment: '0: 入金, 1: 出金, 2: 送金'
+  t.datetime :transaction_time, null: false
 
   t.timestamps null: false
 end
 
-create_table 'wallet_transactions', comment: 'ウォレットの増減記録' do |t|
-  t.references :wallet, null: true, foreign_key: { to_table: :wallets }
-  t.integer 'amount', null: false
-  t.integer 'payment_type', null: false
-  t.datetime 'transaction_time', null: false
+create_table 'stable_coins', comment: 'ステーブルコイン' do |t|
+  t.references :contract, null: false, foreign_key: { to_table: :contracts }
+  t.string :color_id, null: false
 
   t.timestamps null: false
 end
 
-create_table 'dids', comment: 'DID' do |t|
-  t.references :user, null: true, foreign_key: { to_table: :users }
-  t.string 'short_form', null: false
-  t.index :short_form, unique: true
+create_table 'stable_coin_transactions', comment: 'ステーブルコインの増減履歴' do |t|
+  t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
+  t.integer :amount, null: false
+  t.string :txid, null: false
+  t.integer :transaction_type, null: false
+  t.datetime :transaction_time, null: false
+
+  t.timestamps null: false
 end
 
 create_table 'contracts', comment: '契約' do |t|
   t.references :brand_did, null: false
   t.references :issuer_did, null: false
-  t.string 'script_pubkey', null: false
-  t.string 'redeem_script', null: false
-  t.datetime 'contracted_at', null: false, comment: '契約締結日'
-  t.datetime 'effect_at', null: false, comment: '効力発生日'
-  t.datetime 'expire_at', null: false, comment: '失効日'
+  t.string :script_pubkey, null: false
+  t.string :redeem_script, null: false
+  t.datetime :contracted_at, null: false, comment: '契約締結日'
+  t.datetime :effect_at, null: false, comment: '効力発生日'
+  t.datetime :expire_at, null: false, comment: '失効日'
+
+  t.timestamps null: false
 end
 add_foreign_key :contracts, :dids, column: :brand_did_id
 add_foreign_key :contracts, :dids, column: :issuer_did_id
 
-create_table 'stable_coins', comment: 'ステーブルコイン' do |t|
-  t.references :contract, null: false, foreign_key: { to_table: :contracts }
-  t.string 'color_id', null: false
-end
-
-create_table 'coin_transactions', comment: 'ステーブルコインの発行償還履歴' do |t|
-  t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
-  t.references :wallet, null: false, foreign_key: { to_table: :wallets }
-  t.text 'tx_hex', null: false
-  t.integer 'amount', null: false
-  t.integer 'payment_type', null: false
-  t.datetime 'transaction_time', null: false
-end
-
-create_table 'account_transactions', comment: '口座の残高履歴' do |t|
-  t.references :account, null: true, foreign_key: { to_table: :accounts }
-  t.integer 'amount', null: false
-  t.integer 'payment_type', null: false
-  t.datetime 'transaction_time', null: false
+create_table 'issuance_transactions', comment: '発行履歴' do |t|
+  t.references :stable_coin_transaction, null: false, foreign_key: { to_table: :stable_coin_transactions }
+  t.references :wallet_transaction, null: true, foreign_key: { to_table: :wallet_transactions }
+  t.references :account_transaction, null: true, foreign_key: { to_table: :account_transactions }
+  t.integer :amount, null: false
+  t.string :txid, null: false
+  t.datetime :transaction_time, null: false
 
   t.timestamps null: false
 end
 
-create_table 'keys', comment: 'userの秘密鍵' do |t|
-  t.references :did, null: true, foreign_key: { to_table: :dids }
-  t.string 'private_key', null: true
+create_table 'issuance_requests', comment: '発行依頼' do |t|
+  t.references :issuance_transaction, null: true, foreign_key: { to_table: :issuance_transactions }
+  t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
+  t.references :user, null: true, foreign_key: { to_table: :users }
+  t.string :request_id, null: false, index: true
+  t.integer :status, null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+
+  t.timestamps null: false
+end
+
+create_table 'payment_transactions', comment: '支払い履歴' do |t|
+  t.references :wallet_transaction, null: true, foreign_key: { to_table: :wallet_transactions }
+  t.integer :amount, null: false
+  t.string :txid, null: false
+  t.string :vc, null: false
+  t.datetime :transaction_time, null: false
+
+  t.timestamps null: false
 end
 
 create_table 'payment_requests', comment: '送金依頼' do |t|
-  # t.references :なんとかトランサクジョン, null: false, foreign_key: { to_table: :なんとかトランサクジョンs }
+  t.references :payment_transaction, null: true, foreign_key: { to_table: :payment_transactions }
   t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
   t.references :user, null: true, foreign_key: { to_table: :users }
-  t.string 'request_id', null: false, index: true
-  t.integer 'status', null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+  t.string :request_id, null: false, index: true
+  t.integer :status, null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+  t.string :vc, null: false
+
+  t.timestamps null: false
+end
+
+create_table 'withdrawal_transactions', comment: '償還履歴' do |t|
+  t.references :stable_coin_transaction, null: false, foreign_key: { to_table: :stable_coin_transactions }
+  t.integer :amount, null: false
+  t.string :merchant_to_brand_txid, null: true
+  t.string :brand_to_issuer_txid, null: true
+  t.string :burn_txid, null: true
+  t.datetime :transaction_time, null: false
 
   t.timestamps null: false
 end
 
 create_table 'withdrawal_requests', comment: '償還依頼' do |t|
-  # t.references :なんとかトランサクジョン, null: false, foreign_key: { to_table: :なんとかトランサクジョンs }
-  t.string 'request_id', null: false, index: true
-  t.integer 'status', null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
-  t.string 'brand_to_issuer_txid', null: true
-  t.string 'burn_txid', null: true
+  t.references :withdrawal_transaction, null: true, foreign_key: { to_table: :withdrawal_transactions }
+  t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
+  t.string :request_id, null: false, index: true
+  t.integer :status, null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+  t.string :merchant_to_brand_txid, null: true
+  t.string :brand_to_issuer_txid, null: true
+  t.string :burn_txid, null: true
 
   t.timestamps null: false
 end
+
+# =====================================================================================================================
 
 create_table 'glueby_keys', force: :cascade do |t|
   t.string 'private_key'

@@ -8,7 +8,7 @@ class PaymentsController < ApplicationController
     user = Did.find_by(short_form: user_did).user
     stable_coin = StableCoin.last
 
-    PaymentRequest.create(request_id: params[:request_id], stable_coin:, user:)
+    PaymentRequest.create!(request_id: params[:request_id], stable_coin:, user:, vc:, status: :created)
 
     tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
 
@@ -34,7 +34,7 @@ class PaymentsController < ApplicationController
   end
 
   def confirm
-    request = PaymentRequest.find_by(request_id: params[:request_id])
+    request = PaymentRequest.find_by!(request_id: params[:request_id])
 
     tx_hex = params[:tx]
     lock_script_hex = params[:lock_script]
@@ -45,17 +45,37 @@ class PaymentsController < ApplicationController
     tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
 
     # add sig for token
-    issuer_key = Tapyrus::Key.new(priv_key: stable_coin.contract.issuer_did.key.private_key, key_type: 0)
+    issuer_key = Did.first.key.to_tapyrus_key
     sig_hash = tx.sighash_for_input(0, lock_script)
     sig = issuer_key.sign(sig_hash) + [Tapyrus::SIGHASH_TYPE[:all]].pack("C")
     tx.in[0].script_sig << sig
 
     txid = Glueby::Internal::RPC.client.sendrawtransaction(tx.to_payload.bth)
-    generate_block
-
     request.update!(status: :transfering)
 
-    # TODO: Transaction系の設計よく分からんのでパス
+    # 本来この先非同期
+    generate_block
+
+    amount = tx.outputs.first.value
+
+    wallet = request.user.wallet
+    wallet.update!(balance: wallet.balance - amount)
+    wallet_transaction = WalletTransaction.create!(
+      wallet:,
+      amount: -amount ,
+      transaction_type: :transfer,
+      transaction_time: Time.current
+    )
+
+    payment_transaction = PaymentTransaction.create!(
+      wallet_transaction:,
+      amount:,
+      txid:,
+      vc: request.vc,
+      transaction_time: DateTime.current
+    )
+
+    request.update!(payment_transaction:, status: :completed)
 
     render json: { txid: }
   end

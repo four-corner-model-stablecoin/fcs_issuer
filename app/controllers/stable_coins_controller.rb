@@ -33,7 +33,7 @@ class StableCoinsController < ApplicationController
 
     # colorの導出
     user_key = resolve_did(current_user.did)
-    issuer_key =Tapyrus::Key.new(priv_key: stable_coin.contract.issuer_did.key.private_key, key_type: 0)
+    issuer_key = Did.first.key.to_tapyrus_key
     brand_key = resolve_did(stable_coin.contract.brand_did)
     two_of_three_color_script= Tapyrus::Script.new << stable_coin.color_id << Tapyrus::Opcodes::OP_COLOR << Tapyrus::Opcodes::OP_2 << user_key.pubkey << issuer_key.pubkey << brand_key.pubkey << Tapyrus::Opcodes::OP_3 << Tapyrus::Opcodes::OP_CHECKMULTISIG 
 
@@ -59,37 +59,54 @@ class StableCoinsController < ApplicationController
 
     tx.in[0].script_sig = script_sig
 
-    Glueby::Internal::RPC.client.sendrawtransaction(tx.to_payload.bth)
+    txid = Glueby::Internal::RPC.client.sendrawtransaction(tx.to_payload.bth)
 
-    account = current_user.account
-    account.update!(balance: account.balance - amount)
+    request_id = SecureRandom.uuid
+    request = IssuanceRequest.create!(stable_coin:, user: current_user, request_id:, status: :created)
+
+    # MEMO: この先本来非同期
+    generate_block
+
+    amount = tx.outputs[vout].value
+
+    stable_coin_transaction = StableCoinTransaction.create(
+      stable_coin:,
+      amount:,
+      txid:,
+      transaction_type: :issue,
+      transaction_time: Time.current
+    )
 
     wallet = current_user.wallet
     wallet.update!(balance: wallet.balance + amount)
-
-    CoinTransaction.create(
-      stable_coin:,
+    wallet_transaction = WalletTransaction.create(
       wallet:,
-      tx_hex: tx.to_hex, 
-      amount: tx.outputs[vout].value,
-      payment_type: 0,
+      amount:,
+      transaction_type: :deposit,
       transaction_time: Time.current
     )
 
-    WalletTransaction.create(
-      wallet:,
-      amount: tx.outputs[vout].value,
-      payment_type: 0,
+    account = current_user.account
+    account.update!(balance: account.balance - amount)
+    account_transaction = AccountTransaction.create(
+      account:,
+      amount: -amount,
+      transaction_type: :transfer,
       transaction_time: Time.current
     )
 
-    AccountTransaction.create(
-      account: account,
-      amount: -tx.outputs[vout].value,
-      payment_type: 1,
-      transaction_time: Time.current
+    # MEMO: CreateIssuanceTransactionService のなかで StableCoinTransaction/WalletTransaction/AccountTransaction を作りたい
+    issuance_transaction = IssuanceTransaction.create!(
+      amount:,
+      txid:,
+      stable_coin_transaction:,
+      account_transaction:,
+      wallet_transaction:,
+      transaction_time: DateTime.current
     )
-    generate_block
+
+    request.update!(issuance_transaction:, status: :completed)
+
     redirect_to user_path, notice: "Issue successful."
   end
 
@@ -97,36 +114,5 @@ class StableCoinsController < ApplicationController
 
   def deposit_params
     params.require(:stable_coin).permit(:amount)
-  end
-
-  def generate_block
-    address =  Glueby::Internal::RPC.client.getnewaddress
-    aggregate_private_key = ENV['TAPYRUS_AUTHORITY_KEY']
-    Glueby::Internal::RPC.client.generatetoaddress(1, address, aggregate_private_key)
-
-    latest_block_num = Glueby::Internal::RPC.client.getblockcount
-    synced_block = Glueby::AR::SystemInformation.synced_block_height
-    (synced_block.int_value + 1..latest_block_num).each do |height|
-      Glueby::BlockSyncer.new(height).run
-      synced_block.update(info_value: height.to_s)
-    end
-  end
-
-  def resolve_did(did)
-    response = Net::HTTP.get(URI("#{ENV['DID_SERVICE_URI']}/did/resolve/#{did.short_form}"))
-    public_key_jwk = JSON.parse(response)['did']['didDocument']['verificationMethod'][0]['publicKeyJwk']
-    jwk = JSON::JWK.new(public_key_jwk)
-
-    jwk_to_tapyrus_key(jwk)
-  end
-
-  def jwk_to_tapyrus_key(jwk)
-    key = jwk.to_key
-
-    if key.private_key.nil?
-      Tapyrus::Key.new(pubkey: key.public_key.to_bn.to_s(16).downcase.encode('US-ASCII'), key_type: 0)
-    else
-      Tapyrus::Key.new(priv_key: key.private_key.to_s(16).downcase.encode('US-ASCII'), key_type: 0)
-    end
   end
 end

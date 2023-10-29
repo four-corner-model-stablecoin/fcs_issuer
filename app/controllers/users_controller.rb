@@ -10,11 +10,10 @@ class UsersController < ApplicationController
   def new; end
 
   def create
-    user = User.create(username: user_params['username'])
+    did = Did.create!(short_form: user_params['did'])
+    user = User.create!(username: user_params['username'], did:)
     user.build_account.save!
     user.build_wallet.save!
-    # User作成の前に、Userから提示されたDIDが正しいのかなどの処理は必要そう。
-    Did.create!(user:, short_form: user_params['did'])
 
     sign_in(user)
 

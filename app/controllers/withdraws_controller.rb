@@ -3,10 +3,9 @@
 class WithdrawsController < ApplicationController
   def create
     request_id = params[:request_id]
+    merchant_to_brand_txid = params[:merchant_to_brand_txid]
     brand_to_issuer_txid = params[:brand_to_issuer_txid]
     brand_to_issuer_tx = Tapyrus::Tx.parse_from_payload(Glueby::Internal::RPC.client.getrawtransaction(brand_to_issuer_txid).htb)
-
-    request = WithdrawalRequest.create(request_id:, brand_to_issuer_txid:)
 
     # token outpoint
     # vout = 0 で決めうち
@@ -16,8 +15,10 @@ class WithdrawsController < ApplicationController
     color_identifier = token_script_pubkey.color_id
     stable_coin = StableCoin.find_by(color_id: color_identifier.to_payload.bth)
 
+    request = WithdrawalRequest.create!(request_id:, stable_coin:, merchant_to_brand_txid:, brand_to_issuer_txid:, status: :created)
+
     # issuer key
-    issuer_key = Tapyrus::Key.new(priv_key: stable_coin.contract.issuer_did.key.private_key, key_type: 0)
+    issuer_key = Did.first.key.to_tapyrus_key
 
     tx = Tapyrus::Tx.new
 
@@ -47,11 +48,33 @@ class WithdrawsController < ApplicationController
     tx.in[1].script_sig << key.pubkey
 
     burn_txid = Glueby::Internal::RPC.client.sendrawtransaction(tx.to_payload.bth)
+
+    request.update!(burn_txid:, status: :transfering)
+
+    # MEMO: 本来は非同期に実行、デモではgenerate_blockを用いて同期実行
+    # if ENV['DEMO'] = 1
     generate_block
 
-    request.update!(burn_txid:)
+    amount = tx.outputs.first.value
 
-    # TODO: Transaction系の設計よく分からんのでパス
+    stable_coin_transaction = StableCoinTransaction.create!(
+      stable_coin:,
+      amount: -amount,
+      txid: burn_txid,
+      transaction_type: :issue,
+      transaction_time: Time.current
+    )
+
+    withdrawal_transaction = WithdrawalTransaction.create!(
+      stable_coin_transaction:,
+      amount:,
+      merchant_to_brand_txid: request.merchant_to_brand_txid,
+      brand_to_issuer_txid: request.brand_to_issuer_txid,
+      burn_txid:,
+      transaction_time: DateTime.current
+    )
+
+    request.update!(withdrawal_transaction:, status: :completed)
 
     render json: { burn_txid: }
   end

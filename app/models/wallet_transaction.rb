@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 class WalletTransaction < ApplicationRecord
+  validates :amount, presence: true
+  validates :transaction_type, presence: true
+  validates :transaction_time, presence: true
+
+  has_one :issuance_transaction
+  has_one :payment_transaction
   belongs_to :wallet
 
-  enum payment_type: {
-    deposit: 0,
-    withdrawal: 1
+  enum transaction_type: {
+    deposit: 0, # 入金
+    withdrawal: 1, # 出金
+    transfer: 2 # 送金
   }
-
-  validates :amount, presence: true
-  validates :payment_type, presence: true
-  validates :transaction_time, presence: true
 end

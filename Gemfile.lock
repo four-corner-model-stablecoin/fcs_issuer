@@ -76,6 +76,8 @@ GEM
     daemon-spawn (0.4.2)
     date (3.3.3)
     diffy (3.4.2)
+    dockerfile-rails (1.5.12)
+      rails (>= 3.0.0)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
@@ -140,6 +142,8 @@ GEM
     net-smtp (0.4.0)
       net-protocol
     nio4r (2.5.9)
+    nokogiri (1.15.4-aarch64-linux)
+      racc (~> 1.4)
     nokogiri (1.15.4-arm64-darwin)
       racc (~> 1.4)
     parallel (1.23.0)
@@ -245,6 +249,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
+    sqlite3 (1.6.7-aarch64-linux)
     sqlite3 (1.6.7-arm64-darwin)
     tapyrus (0.3.4)
       activesupport (>= 5.2.3)
@@ -287,12 +292,14 @@ GEM
     zeitwerk (2.6.12)
 
 PLATFORMS
+  aarch64-linux
   arm64-darwin-21
   arm64-darwin-22
 
 DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
+  dockerfile-rails (>= 1.5)
   dotenv-rails
   glueby
   jbuilder (~> 2.7)

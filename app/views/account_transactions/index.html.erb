@@ -1,9 +1,9 @@
 <h2>
-  WalletTransaction
+  AccountTransaction
 </h2>
 
 <h3>
-  <%= "Wallet##{@wallet.id}" %>
+  <%= "Account##{@account.id}" %>
 </h3>
 
 <table>
@@ -13,7 +13,7 @@
     <th>種別</th>
     <th>取引日時</th>
   </tr>
-  <% @wallet_transactions.each do |transaction| %>
+  <% @account_transactions.each do |transaction| %>
     <tr>
       <td><%= transaction.id %></td>
       <td><%= transaction.amount %></td>

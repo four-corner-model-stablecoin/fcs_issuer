@@ -7,7 +7,7 @@ class WalletsController < ApplicationController
 
   def show
     @wallet = current_user.wallet
-    # @wallet_payment_transactions = @wallet.&wallet_payment_transaction.order(transaction_time: :DESC)
+    @wallet_transactions = @wallet.wallet_transactions.order(transaction_time: :DESC)
   end
 
   def new; end

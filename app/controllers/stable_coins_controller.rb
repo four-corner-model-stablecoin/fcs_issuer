@@ -4,7 +4,6 @@ class StableCoinsController < ApplicationController
   before_action :signed_in?
 
   def new
-    @wallet_transactions = current_user.wallet.wallet_transaction.order(transaction_time: :DESC)
   end
 
   def create

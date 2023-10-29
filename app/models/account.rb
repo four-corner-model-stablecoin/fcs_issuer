@@ -8,7 +8,7 @@ class Account < ApplicationRecord
 
   belongs_to :user
 
-  has_many :account_transaction
+  has_many :account_transactions
 
   after_initialize do
     self.balance ||= 0.0

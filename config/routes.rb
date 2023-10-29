@@ -12,6 +12,11 @@ Rails.application.routes.draw do
   resource :account, only: %i[show new create]
   resources :contracts, only: %i[new create]
   resources :stable_coins, only: %i[new create]
+  resources :account_transactions, only: %i[index]
+  resources :wallet_transactions, only: %i[index]
+  resources :issuance_transactions, only: %i[index]
+  resources :payment_transactions, only: %i[index]
+  resources :withdrawal_transactions, only: %i[index]
 
   post 'payment/create', to: 'payments#create'
   post 'payment/confirm', to: 'payments#confirm'

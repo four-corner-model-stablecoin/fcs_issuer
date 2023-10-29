@@ -1,0 +1,22 @@
+<h2>
+  IssuanceTransaction
+</h2>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>金額</th>
+    <th>口座入出金履歴</th>
+    <th>ウォレット入出金履歴</th>
+    <th>取引日時</th>
+  </tr>
+  <% @issuance_transactions.each do |transaction| %>
+    <tr>
+      <td><%= transaction.id %></td>
+      <td><%= transaction.amount %></td>
+      <td><%= link_to "AccountTransaction##{transaction.id}", account_transactions_path %></td>
+      <td><%= link_to "WalletTransaction##{transaction.id}", wallet_transactions_path %></td>
+      <td><%= transaction.transaction_time %></td>
+    </tr>
+  <% end %>
+</table>

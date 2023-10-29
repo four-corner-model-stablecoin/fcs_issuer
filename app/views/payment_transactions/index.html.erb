@@ -1,23 +1,17 @@
 <h2>
-  WalletTransaction
+  PaymentTransaction
 </h2>
-
-<h3>
-  <%= "Wallet##{@wallet.id}" %>
-</h3>
 
 <table>
   <tr>
     <th>ID</th>
     <th>金額</th>
-    <th>種別</th>
     <th>取引日時</th>
   </tr>
-  <% @wallet_transactions.each do |transaction| %>
+  <% @payment_transactions.each do |transaction| %>
     <tr>
       <td><%= transaction.id %></td>
       <td><%= transaction.amount %></td>
-      <td><%= transaction.transaction_type %></td>
       <td><%= transaction.transaction_time %></td>
     </tr>
   <% end %>

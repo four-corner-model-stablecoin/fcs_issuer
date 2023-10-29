@@ -47,7 +47,7 @@ class StableCoinsController < ApplicationController
       unsigned_tx: tx.to_hex
     }.to_json
     response = Net::HTTP.post(
-      URI('http://localhost:3001/stable_coins/issue'),
+      URI("#{ENV['BRAND_URL']}/stable_coins/issue"),
       params_json,
       'Content-Type' => 'application/json'
     )

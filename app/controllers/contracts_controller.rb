@@ -12,7 +12,7 @@ class ContractsController < ApplicationController
       did: issuer_did.short_form,
     }.to_json
     response = Net::HTTP.post(
-    URI('http://localhost:3001/contracts/agreement/issuer'),
+    URI("#{ENV['BRAND_URL']}/contracts/agreement/issuer"),
     json,
     'Content-Type' => 'application/json'
     )

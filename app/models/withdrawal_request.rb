@@ -2,6 +2,7 @@
 
 class WithdrawalRequest < ApplicationRecord
   validates :request_id, presence: true
+  validates :amount, presence: true
 
   belongs_to :stable_coin
   belongs_to :withdrawal_transaction, optional: true

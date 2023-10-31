@@ -3,6 +3,7 @@
 class WithdrawsController < ApplicationController
   def create
     request_id = params[:request_id]
+    amount = params[:amount]
     merchant_to_brand_txid = params[:merchant_to_brand_txid]
     brand_to_issuer_txid = params[:brand_to_issuer_txid]
     brand_to_issuer_tx = Tapyrus::Tx.parse_from_payload(Glueby::Internal::RPC.client.getrawtransaction(brand_to_issuer_txid).htb)
@@ -15,7 +16,7 @@ class WithdrawsController < ApplicationController
     color_identifier = token_script_pubkey.color_id
     stable_coin = StableCoin.find_by(color_id: color_identifier.to_payload.bth)
 
-    request = WithdrawalRequest.create!(request_id:, stable_coin:, merchant_to_brand_txid:, brand_to_issuer_txid:, status: :created)
+    request = WithdrawalRequest.create!(request_id:, stable_coin:, amount:, merchant_to_brand_txid:, brand_to_issuer_txid:, status: :created)
 
     # issuer key
     issuer_key = Did.first.key.to_tapyrus_key
@@ -55,7 +56,7 @@ class WithdrawsController < ApplicationController
     # if ENV['DEMO'] = 1
     generate_block
 
-    amount = tx.outputs.first.value
+    amount = request.amount
 
     stable_coin_transaction = StableCoinTransaction.create!(
       stable_coin:,

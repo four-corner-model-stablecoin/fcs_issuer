@@ -144,6 +144,7 @@ create_table 'withdrawal_requests', comment: '償還依頼' do |t|
   t.references :stable_coin, null: false, foreign_key: { to_table: :stable_coins }
   t.string :request_id, null: false, index: true
   t.integer :status, null: false, default: 0, comment: '0: 未完了, 1: 完了, 9: 失敗'
+  t.integer :amount, null: false, comment: '金額'
   t.string :merchant_to_brand_txid, null: true
   t.string :brand_to_issuer_txid, null: true
   t.string :burn_txid, null: true

@@ -6,12 +6,14 @@
   <tr>
     <th>ID</th>
     <th>金額</th>
+    <th>ウォレット入出金履歴</th>
     <th>取引日時</th>
   </tr>
   <% @payment_transactions.each do |transaction| %>
     <tr>
       <td><%= transaction.id %></td>
       <td><%= transaction.amount %></td>
+      <td><%= link_to "WalletTransaction##{transaction.id}", wallet_transactions_path %></td>
       <td><%= transaction.transaction_time %></td>
     </tr>
   <% end %>

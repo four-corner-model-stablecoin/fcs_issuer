@@ -20,7 +20,7 @@
             Account Balance
           </div>
           <div>
-            <%= number_to_currency(current_user.account.balance) %>
+            <%= number_to_currency(current_user.account.balance, precision: 0) %>
           </div>
         </div>
       <% end %>
@@ -34,7 +34,7 @@
               Wallet Balance
             </div>
             <div>
-              <%= number_to_currency(current_user.wallet.balance) %>
+              <%= number_to_currency(current_user.wallet.balance, precision: 0) %>
             </div>
           </div>
         <% end %>

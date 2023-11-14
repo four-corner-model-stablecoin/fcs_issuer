@@ -7,7 +7,7 @@
     ウォレット残高
   </div>
   <div>
-    <%= number_to_currency(current_user.wallet.balance) %>
+    <%= number_to_currency(current_user.wallet.balance, precision: 0) %>
   </div>
 </div>
 

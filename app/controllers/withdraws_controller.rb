@@ -62,7 +62,7 @@ class WithdrawsController < ApplicationController
       stable_coin:,
       amount: -amount,
       txid: burn_txid,
-      transaction_type: :issue,
+      transaction_type: :burn,
       transaction_time: Time.current
     )
 

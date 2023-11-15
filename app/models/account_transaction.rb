@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# 口座残高履歴モデル
 class AccountTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :transaction_type, presence: true

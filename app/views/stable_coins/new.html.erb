@@ -1,10 +1,10 @@
 <h2>
-  Issue
+  ステーブルコイン発行
 </h2>
 
 <div>
   <div>
-    Wallet Balance
+    ステーブルコイン残高
   </div>
   <div>
     <%= number_to_currency(current_user.wallet.balance, precision: 0) %>
@@ -17,4 +17,3 @@
     <%= form.submit "Issue" %>
   </div>
 <% end %>
-

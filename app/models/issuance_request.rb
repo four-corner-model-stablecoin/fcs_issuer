@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# ステーブルコイン発行リクエストモデル
 class IssuanceRequest < ApplicationRecord
   validates :request_id, presence: true
 

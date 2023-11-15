@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# ステーブルコイン発行履歴モデル
 class IssuanceTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :txid, presence: true

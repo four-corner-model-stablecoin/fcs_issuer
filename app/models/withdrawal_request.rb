@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# ステーブルコイン償還リクエストモデル
 class WithdrawalRequest < ApplicationRecord
   validates :request_id, presence: true
   validates :amount, presence: true

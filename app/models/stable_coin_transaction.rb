@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# ステーブルコイン増減履歴モデル（発行償還履歴）
 class StableCoinTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :transaction_type, presence: true

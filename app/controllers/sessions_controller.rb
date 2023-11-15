@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
     user = User.find_by(username: session_params[:username])
     sign_in(user) if user
 
-    redirect_to root_path
+    redirect_to user_path
   end
 
   def destroy

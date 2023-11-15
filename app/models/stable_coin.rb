@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# 発行トークンを管理するモデル
+# ステーブルコインモデル
 class StableCoin < ApplicationRecord
   validates :color_id, presence: true
 

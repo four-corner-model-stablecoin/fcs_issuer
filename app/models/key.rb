@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# 鍵モデル
 class Key < ApplicationRecord
   validates :jwk, presence: true
 

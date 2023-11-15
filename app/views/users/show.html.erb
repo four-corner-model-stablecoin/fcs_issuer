@@ -1,26 +1,20 @@
 <div>
   <div>
     <h2>
-      User information
+      マイページ
     </h2>
 
     <div>
       <div>
-        User Name
-      </div>
-      <div>
-        <%= current_user.username %>
+        <%= "ユーザーネーム: #{current_user.username}" %>
       </div>
     </div>
 
     <div>
-      <%= link_to new_account_path do %>
+      <%= link_to account_transactions_path do %>
         <div>
           <div>
-            Account Balance
-          </div>
-          <div>
-            <%= number_to_currency(current_user.account.balance, precision: 0) %>
+            <%= "現金残高: #{number_to_currency(current_user.account.balance, precision: 0)}" %>
           </div>
         </div>
       <% end %>
@@ -28,21 +22,24 @@
 
     <% if current_user.wallet.present? %>
       <div>
-        <%= link_to new_stable_coin_path do %>
+        <%= link_to wallet_transactions_path do %>
           <div>
             <div>
-              Wallet Balance
-            </div>
-            <div>
-              <%= number_to_currency(current_user.wallet.balance, precision: 0) %>
+              <%= "ステーブルコイン残高: #{number_to_currency(current_user.wallet.balance, precision: 0)}" %>
             </div>
           </div>
         <% end %>
       </div>
     <% end %>
 
-    <div>
-      <%= button_to 'Log out', logout_path, method: :delete %>
-    </div>
+    <h3>
+      ステーブルコイン発行
+    </h3>
+    <%= form_with scope: :stable_coin, url: stable_coins_path do |form| %>
+      <div>
+        <%= form.number_field :amount, placeholder: "金額", required: true %>
+        <%= form.submit "発行" %>
+      </div>
+    <% end %>
   </div>
 </div>

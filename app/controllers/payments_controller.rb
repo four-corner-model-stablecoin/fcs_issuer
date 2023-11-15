@@ -10,6 +10,7 @@ class PaymentsController < ApplicationController
 
     PaymentRequest.create!(request_id: params[:request_id], stable_coin:, user:, vc:, status: :created)
 
+    # 顧客から受け取ったトランザクション
     tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
 
     # TODO: Verify output
@@ -40,8 +41,6 @@ class PaymentsController < ApplicationController
     lock_script_hex = params[:lock_script]
     lock_script = Tapyrus::Script.parse_from_payload(lock_script_hex.htb)
 
-    stable_coin = StableCoin.last
-
     tx = Tapyrus::Tx.parse_from_payload(tx_hex.htb)
 
     # add sig for token
@@ -53,11 +52,12 @@ class PaymentsController < ApplicationController
     txid = Glueby::Internal::RPC.client.sendrawtransaction(tx.to_payload.bth)
     request.update!(status: :transfering)
 
-    # 本来この先非同期
+    # MEMO: 本来は非同期に実行、デモではgenerate_blockを用いて同期的に実行
     generate_block
 
     amount = tx.outputs.first.value
 
+    # 顧客ウォレットを操作
     wallet = request.user.wallet
     wallet.update!(balance: wallet.balance - amount)
     wallet_transaction = WalletTransaction.create!(
@@ -67,6 +67,7 @@ class PaymentsController < ApplicationController
       transaction_time: Time.current
     )
 
+    # 送金履歴作成
     payment_transaction = PaymentTransaction.create!(
       wallet_transaction:,
       amount:,

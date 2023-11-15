@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# ステーブルコイン送金リクエストモデル
 class PaymentRequest < ApplicationRecord
   validates :request_id, presence: true
   validates :vc, presence: true

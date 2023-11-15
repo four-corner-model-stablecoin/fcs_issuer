@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# 顧客ウォレット残高履歴モデル
 class WalletTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :transaction_type, presence: true

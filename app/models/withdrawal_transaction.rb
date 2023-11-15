@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-
+#
+# ステーブルコイン償還履歴モデル
 class WithdrawalTransaction < ApplicationRecord
   validates :amount, presence: true
   validates :merchant_to_brand_txid, presence: true

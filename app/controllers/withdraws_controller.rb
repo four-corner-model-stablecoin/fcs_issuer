@@ -52,12 +52,13 @@ class WithdrawsController < ApplicationController
 
     request.update!(burn_txid:, status: :transfering)
 
-    # MEMO: 本来は非同期に実行、デモではgenerate_blockを用いて同期実行
+    # MEMO: 本来は非同期に実行、デモではgenerate_blockを用いて同期的に実行
     # if ENV['DEMO'] = 1
     generate_block
 
     amount = request.amount
 
+    # ステーブルコイン発行償還履歴作成
     stable_coin_transaction = StableCoinTransaction.create!(
       stable_coin:,
       amount: -amount,
@@ -66,6 +67,7 @@ class WithdrawsController < ApplicationController
       transaction_time: Time.current
     )
 
+    # 償還履歴作成
     withdrawal_transaction = WithdrawalTransaction.create!(
       stable_coin_transaction:,
       amount:,

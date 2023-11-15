@@ -36,7 +36,7 @@ class ApplicationController < ActionController::Base
   end
 
   def resolve_did(did)
-    response = Net::HTTP.get(URI("#{ENV['DID_SERVICE_URI']}/did/resolve/#{did.short_form}"))
+    response = Net::HTTP.get(URI("#{ENV['DID_SERVICE_URL']}/did/resolve/#{did.short_form}"))
     public_key_jwk = JSON.parse(response)['did']['didDocument']['verificationMethod'][0]['publicKeyJwk']
     jwk = JSON::JWK.new(public_key_jwk)
 

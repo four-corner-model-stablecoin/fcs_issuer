@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   root 'home#index'
-  
+
   get 'signup', to: 'users#new'
   post 'signup', to: 'users#create'
   get 'login', to: 'sessions#new'
@@ -24,5 +24,9 @@ Rails.application.routes.draw do
 
     post 'withdraw/create', to: 'withdraws#create'
     post 'withdraw/confirm', to: 'withdraws#confirm'
+
+    resources :issuance_requests, only: %i[show]
+    resources :payment_requests, only: %i[show]
+    resources :withdrawal_requests, only: %i[show]
   end
 end

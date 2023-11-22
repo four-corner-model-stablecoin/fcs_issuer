@@ -36,7 +36,8 @@ module Api
     end
 
     def confirm
-      request = PaymentRequest.find_by!(request_id: params[:request_id])
+      request_id = params[:request_id]
+      request = PaymentRequest.find_by!(request_id:)
 
       tx_hex = params[:tx]
       lock_script_hex = params[:lock_script]
@@ -79,7 +80,7 @@ module Api
 
       request.update!(payment_transaction:, status: :completed)
 
-      render json: { txid: }
+      render json: { request_id:, txid: }
     end
   end
 end

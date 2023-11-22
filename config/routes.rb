@@ -18,9 +18,11 @@ Rails.application.routes.draw do
   resources :payment_transactions, only: %i[index]
   resources :withdrawal_transactions, only: %i[index]
 
-  post 'payment/create', to: 'payments#create'
-  post 'payment/confirm', to: 'payments#confirm'
+  namespace :api do
+    post 'payment/create', to: 'payments#create'
+    post 'payment/confirm', to: 'payments#confirm'
 
-  post 'withdraw/create', to: 'withdraws#create'
-  post 'withdraw/confirm', to: 'withdraws#confirm'
+    post 'withdraw/create', to: 'withdraws#create'
+    post 'withdraw/confirm', to: 'withdraws#confirm'
+  end
 end

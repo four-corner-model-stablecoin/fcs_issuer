@@ -11,8 +11,11 @@ RUN apt-get update \
 ENV APP_ROOT /fcs_issuer
 WORKDIR $APP_ROOT
 
-COPY . .
+COPY Gemfile $APP_ROOT/Gemfile
+COPY Gemfile.lock $APP_ROOT/Gemfile.lock
 RUN bundle install
+
+COPY . .
 
 ENV NODE_OPTIONS --openssl-legacy-provider
 

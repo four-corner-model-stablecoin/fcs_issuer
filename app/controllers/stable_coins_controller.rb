@@ -15,7 +15,7 @@ class StableCoinsController < ApplicationController
     redeem_script = Tapyrus::Script.parse_from_payload(stable_coin.contract.redeem_script.htb)
 
     request_id = SecureRandom.uuid
-    request = IssuanceRequest.create!(stable_coin:, user: current_user, request_id:, status: :created)
+    issuance_request = IssuanceRequest.create!(stable_coin:, user: current_user, request_id:, status: :created)
 
     # 大元のUTXOを作成する
     input_txid = Glueby::Internal::RPC.client.sendtoaddress(script_pubkey.to_addr, 1)
@@ -115,9 +115,13 @@ class StableCoinsController < ApplicationController
       transaction_time: DateTime.current
     )
 
-    request.update!(issuance_transaction:, status: :completed)
+    issuance_request.update!(issuance_transaction:, status: :completed)
 
-    redirect_to user_path, notice: "Issue successful."
+    if request.host == 'localhost'
+      redirect_to user_path, notice: 'Issue successful.'
+    else
+      render json: { request_id: }
+    end
   end
 
   private
